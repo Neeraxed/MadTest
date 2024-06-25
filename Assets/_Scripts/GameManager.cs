@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -11,9 +12,9 @@ public class GameManager : MonoBehaviour
 
     private int moneyAmount;
     private int spinsAmount;
-    private Coroutine cor;
+    private Coroutine coroutine;
 
-    public int Mana
+    public int Spins
     {
         get => spinsAmount;
         set
@@ -22,7 +23,7 @@ public class GameManager : MonoBehaviour
 
             if (spinsAmount < maximumSpins)
             {
-                if(cor == null)
+                if(coroutine == null)
                     StartCoroutine(RestoreMana());
             }
         }
@@ -33,7 +34,7 @@ public class GameManager : MonoBehaviour
         Instance = this;
         UpdateRecources(RouletteCellTypes.Money, PlayerPrefs.GetInt("Money", 0));
 
-        if (PlayerPrefs.GetFloat("LastOnline", 0) - Time.time > 9999)
+        if (PlayerPrefs.GetFloat("LastOnline") == 0 || PlayerPrefs.GetFloat("LastOnline", Int64.MaxValue) - Time.time > 9999)
             UpdateRecources(RouletteCellTypes.Spin, maximumSpins);
         else
             UpdateRecources(RouletteCellTypes.Spin, PlayerPrefs.GetInt("Spins", 0));
@@ -52,8 +53,8 @@ public class GameManager : MonoBehaviour
     private IEnumerator RestoreMana()
     {
         yield return new WaitForSecondsRealtime(5);
-        Mana = 1;
-        cor = null;
+        Spins = 1;
+        coroutine = null;
     }
 
     private void UpdateRecources(RouletteCellTypes type, int value)

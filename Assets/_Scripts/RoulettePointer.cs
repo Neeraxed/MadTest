@@ -20,8 +20,7 @@ public class RoulettePointer : MonoBehaviour
 
     private void CheckResult()
     {
-        RaycastHit2D hit = Physics2D.Raycast(startingPoint.position, Vector3.down);
-        Debug.DrawRay(startingPoint.position, Vector3.down, Color.red);
+        RaycastHit2D hit = Physics2D.Raycast(startingPoint.position, startingPoint.TransformDirection(rouletteCenter.position - startingPoint.position));
         if (hit)
         {
             if (hit.collider.TryGetComponent(out RouletteCell cell))

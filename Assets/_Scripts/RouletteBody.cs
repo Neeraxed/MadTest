@@ -9,16 +9,16 @@ public class RouletteBody : MonoBehaviour
     [SerializeField] private float stopPower;
 
     private Rigidbody2D rb;
-    private int inRotate;
+    private bool isRotating;
     private float t;
 
     public void Rotate()
     {
-        if (GameManager.Instance.Mana > 0 && rb.angularVelocity == 0 && inRotate == 0)
+        if (GameManager.Instance.Spins > 0 && rb.angularVelocity == 0 && !isRotating)
         {
             rb.AddTorque(rotatePower);
-            inRotate = 1;
-            GameManager.Instance.Mana = -1;
+            isRotating = true;
+            GameManager.Instance.Spins = -1;
         }
     }
 
@@ -37,13 +37,13 @@ public class RouletteBody : MonoBehaviour
                 rb.angularVelocity = Mathf.Clamp(rb.angularVelocity, 0, 1440);
             }
 
-            if (rb.angularVelocity == 0 && inRotate == 1)
+            if (rb.angularVelocity == 0 && isRotating)
             {
                 t += Time.fixedDeltaTime;
                 if (t >= 0.5f)
                 {
                     RouletteStopped?.Invoke();
-                    inRotate = 0;
+                    isRotating = false;
                     t = 0;
                 }
             }
