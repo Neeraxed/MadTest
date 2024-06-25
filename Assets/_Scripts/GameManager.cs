@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMPro.TextMeshProUGUI moneyText;
     [SerializeField] private TMPro.TextMeshProUGUI spinsText;
     [SerializeField] private int maximumSpins;
+    [SerializeField] private float timeToRestoreMana;
 
     private int moneyAmount;
     private int spinsAmount;
@@ -52,7 +53,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator RestoreMana()
     {
-        yield return new WaitForSecondsRealtime(5);
+        yield return new WaitForSecondsRealtime(timeToRestoreMana);
         Spins = 1;
         coroutine = null;
     }
