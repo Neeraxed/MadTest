@@ -15,6 +15,16 @@ public class GameManager : MonoBehaviour
     private int spinsAmount;
     private Coroutine coroutine;
 
+    private void OnEnable()
+    {
+        RouletteBody.RouletteStopped += UpdateRecources;
+    }
+    private void OnDisable()
+    {
+        RouletteBody.RouletteStopped -= UpdateRecources;
+
+    }
+
     public int Spins
     {
         get => spinsAmount;
@@ -24,7 +34,7 @@ public class GameManager : MonoBehaviour
 
             if (spinsAmount < maximumSpins)
             {
-                if(coroutine == null)
+                if (coroutine == null)
                     StartCoroutine(RestoreMana());
             }
         }
@@ -41,16 +51,6 @@ public class GameManager : MonoBehaviour
             UpdateRecources(RouletteCellTypes.Spin, PlayerPrefs.GetInt("Spins", 0));
     }
 
-    private void OnEnable()
-    {
-        RoulettePointer.GotInfoFromCell += UpdateRecources;
-    }
-
-    private void OnDisable()
-    {
-        RoulettePointer.GotInfoFromCell -= UpdateRecources;
-    }
-
     private IEnumerator RestoreMana()
     {
         yield return new WaitForSecondsRealtime(timeToRestoreMana);
@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour
 
     private void UpdateRecources(RouletteCellTypes type, int value)
     {
-        if (type == RouletteCellTypes.Money)
+        if (type == RouletteCellTypes.Money || moneyAmount + value > 0)
         {
             moneyAmount += value;
             if (moneyText != null)
@@ -72,6 +72,29 @@ public class GameManager : MonoBehaviour
         else if (type == RouletteCellTypes.Spin)
         {
             spinsAmount += value;
+            PlayerPrefs.SetFloat("LastOnline", Time.time);
+            if (spinsText != null)
+            {
+                spinsText.text = spinsAmount.ToString();
+                PlayerPrefs.SetInt("Spins", spinsAmount);
+            }
+        }
+    }
+
+    private void UpdateRecources(RouletteCell cell)
+    {
+        if (cell.Type == RouletteCellTypes.Money)
+        {
+            moneyAmount += cell.Amount;
+            if (moneyText != null)
+            {
+                moneyText.text = moneyAmount.ToString();
+                PlayerPrefs.SetInt("Money", moneyAmount);
+            }
+        }
+        else if (cell.Type == RouletteCellTypes.Spin)
+        {
+            spinsAmount += cell.Amount;
             PlayerPrefs.SetFloat("LastOnline", Time.time);
             if (spinsText != null)
             {
