@@ -16,11 +16,6 @@ public class RouletteCell : MonoBehaviour
         Amount = value;
         Chance = chance;
     }
-
-    public void UpdateChance(string newChance)
-    {
-        Chance = Int32.Parse(newChance);
-    }
 }
 
 public enum RouletteCellTypes

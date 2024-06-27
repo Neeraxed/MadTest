@@ -9,12 +9,11 @@ public class RouletteBody : MonoBehaviour
 
     public List<RouletteCell> CellsWithChances = new();
 
-    [SerializeField] private int MinRotations = 1;
-    [SerializeField] private int MaxRotations = 1;
-    [SerializeField] private float SpinDuration = 3;
+    [SerializeField] private int rotations = 3;
+    [SerializeField] private float spinDuration = 1;
 
     private bool isRotating;
-    private readonly List<int> weightedList = new List<int>();
+    private readonly List<int> weightedList = new List<int>(100);
     private float anglesPerCell;
     private RouletteCell chosenCell;
 
@@ -27,11 +26,15 @@ public class RouletteBody : MonoBehaviour
             GameManager.Instance.Spins = -1;
         }
     }
-
     private void Start()
     {
         isRotating = false;
         anglesPerCell = 360f / CellsWithChances.Count;
+        UpdateList();
+    }
+
+    private void UpdateList()
+    {
         weightedList.Clear();
 
         foreach (var item in CellsWithChances)
@@ -45,7 +48,7 @@ public class RouletteBody : MonoBehaviour
 
     private IEnumerator SpinTheWheel(Action<int> onResult = null)
     {
-        var randomInfo = new RandomInfo(weightedList, MinRotations, MaxRotations);
+        var randomInfo = new RandomInfo(weightedList, rotations);
 
         foreach (var item in CellsWithChances)
         {
@@ -64,11 +67,10 @@ public class RouletteBody : MonoBehaviour
             currentAngle += 360;
         }
 
-        var targetAngle = (CellsWithChances.IndexOf(chosenCell) * anglesPerCell + 360f * (randomInfo.AmountOfFullRotations + 1) - anglesPerCell / 2);
+        var targetAngle = (CellsWithChances.IndexOf(chosenCell) * anglesPerCell + 360f * rotations - anglesPerCell / 2);
 
-        yield return SpinTheWheel(currentAngle, targetAngle, randomInfo.AmountOfFullRotations * SpinDuration, chosenCell, onResult);
+        yield return SpinTheWheel(currentAngle, targetAngle, rotations * spinDuration, chosenCell, onResult);
     }
-
 
     private IEnumerator SpinTheWheel(float fromAngle, float toAngle, float duration, RouletteCell chosenCell, Action<int> onResult = null)
     {
